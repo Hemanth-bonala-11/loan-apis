@@ -1,0 +1,1 @@
+command: docker-compose build
