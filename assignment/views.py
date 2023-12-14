@@ -286,6 +286,25 @@ class ViewCustomer(generics.ListAPIView):
         customer = Customer.objects.get(pk=customer_id)
         if customer:
             loans = Loan.objects.filter(customer_id=customer_id)
+            response = []
+            if loans:
+                for loan in loans:
+                    loan_data = {}
+                    loan_data["loan_id"] = loan.id
+                    loan_data["loan_amount"] = True
+                    loan_data["interest_rate"] = loan.interest_rate
+                    loan_data["monthly_installment"] = loan.monthly_payment
+                    end_date = datetime.strptime(loan.end_date, "%d-%m-%y")
+                    loan_data["repayments_left"] = relativedelta(end_date,datetime.now()).months
+
+                    response.append(loan_data)
+                return Response(response,
+                                status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    "message": "no loans found"
+                },
+                                status=status.HTTP_200_OK)
 
         else:
             return Response({
